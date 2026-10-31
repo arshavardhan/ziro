@@ -52,11 +52,11 @@ def render_evaluation_dashboard():
     # KPI Strip (8 metrics)
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Overall Accuracy", f"{m['accuracy'] * 100:.1f}%", "16/16 matched")
+        st.metric("Overall Accuracy", f"{m['accuracy'] * 100:.1f}%", f"{m['true_positives'] + m['true_negatives']}/{m['total_test_cases']} matched")
     with col2:
-        st.metric("Precision", f"{m['precision'] * 100:.1f}%", "Zero false positives")
+        st.metric("Precision", f"{m['precision'] * 100:.1f}%", f"FP: {m['false_positives']} (conservative)")
     with col3:
-        st.metric("Recall", f"{m['recall'] * 100:.1f}%", "Zero false negatives")
+        st.metric("Recall", f"{m['recall'] * 100:.1f}%", f"FN: {m['false_negatives']} (reflection edge)")
     with col4:
         st.metric("F1-Score", f"{m['f1']:.3f}", "Harmonic balance")
 

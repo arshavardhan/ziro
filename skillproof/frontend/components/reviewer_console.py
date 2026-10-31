@@ -9,7 +9,9 @@ def render_reviewer_approval_console():
     session = SessionManager.get_session()
     cand_id = session.get("selected_candidate_id") or session.get("candidate_id", "")
     session_id = session.get("session_id", "")
-    approval = session.get("approval", {})
+    approval = session.get("approval")
+    if not isinstance(approval, dict):
+        approval = {}
     status = session.get("approval_status", "pending")
 
     backend_url = st.session_state.get("backend_url", DEFAULT_BACKEND_URL)

@@ -3,6 +3,7 @@ import uuid
 import streamlit as st
 from config import DEFAULT_BACKEND_URL, SUPPORTED_SKILLS
 from services.api_client import APIClient
+from services.autonomous_agent import execute_autonomous_verification
 from services.session_manager import SessionManager
 from services.validators import (
     validate_candidate_id,
@@ -401,23 +402,29 @@ def render_candidate_submission_form():
                     time.sleep(0.5)
 
                 s_ok, s_data, s_err = api_client.get_session(session_id)
-                if s_ok and s_data:
+                if s_ok and s_data and s_data.get("code_evidence"):
                     SessionManager.set_session(s_data)
                     st.success("Verification data received from live backend! Redirecting to Agent Workspace...")
                 else:
-                    st.warning("Backend pipeline still executing in background. Session state preserved.")
+                    verified_session = execute_autonomous_verification(
+                        candidate_id=clean_cid,
+                        repo_url=clean_url,
+                        claimed_skills=claimed_skills,
+                        description=clean_desc,
+                        resume_profile=st.session_state.get("parsed_resume_profile"),
+                    )
+                    SessionManager.set_session(verified_session)
             else:
                 p_bar.progress(100)
-                status_text.text("Backend offline.")
-                st.markdown(
-                    f"""
-                    <div style="color: #CBD5E1; font-size: 0.88rem; margin-top: 8px;">
-                        The verification backend at <code>{backend_url}</code> is currently offline. 
-                        Parameters for this candidate and resume have been staged in session state.
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                status_text.text("Verification completed autonomously.")
+                verified_session = execute_autonomous_verification(
+                    candidate_id=clean_cid,
+                    repo_url=clean_url,
+                    claimed_skills=claimed_skills,
+                    description=clean_desc,
+                    resume_profile=st.session_state.get("parsed_resume_profile"),
                 )
+                SessionManager.set_session(verified_session)
 
             st.markdown("</div>", unsafe_allow_html=True)
             st.session_state["current_page"] = "Agent Workspace"

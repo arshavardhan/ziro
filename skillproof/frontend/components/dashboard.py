@@ -10,6 +10,7 @@ from services.validators import (
     generate_candidate_id_from_repo,
 )
 from services.api_client import APIClient
+from services.autonomous_agent import execute_autonomous_verification
 from config import DEFAULT_BACKEND_URL, SUPPORTED_SKILLS
 
 try:
@@ -335,51 +336,33 @@ def render_overview_dashboard():
         st.session_state["input_claimed_skills"] = claimed_skills_input
         st.session_state["input_description"] = clean_desc
 
-        # Prepare initial session
-        initial_sess = {
-            "session_id": f"prep_{clean_cid}",
-            "candidate_id": clean_cid,
-            "repo_url": clean_url,
-            "claimed_skills": skills_list if skills_list else ["Python"],
-            "description": clean_desc,
-            "status": "PREPARED",
-            "approval_status": "pending",
-            "repo_info": {
-                "repo_name": repo_name,
-                "repo_owner": owner,
-                "repo_url": clean_url,
-            },
-            "code_files": {},
-            "git_commits": [],
-            "timeline": [],
-            "skill_assessment": {},
-            "viva_questions": [],
-            "approval": {},
-            "credential": {},
-            "resume_info": st.session_state.get("parsed_resume_profile"),
-            "resume_skills": st.session_state.get("resume_extracted_skills", []),
-        }
-        SessionManager.set_session(initial_sess)
+        # Auto-process repository analysis, Git cadence, AST code evidence, originality detection, and viva questions
+        with st.spinner(f"🤖 Autonomous agent inspecting repository, extracting Git history, and generating evidence for {owner}/{repo_name}..."):
+            verified_session = execute_autonomous_verification(
+                candidate_id=clean_cid,
+                repo_url=clean_url,
+                claimed_skills=skills_list if skills_list else ["Python"],
+                description=clean_desc,
+                resume_profile=st.session_state.get("parsed_resume_profile"),
+            )
+            SessionManager.set_session(verified_session)
 
-        # If backend is connected, launch pipeline immediately
-        if is_live:
-            with st.spinner(f"🚀 Launching autonomous verification on {clean_url}..."):
-                ok, res, err = api_client.start_analysis(
-                    candidate_id=clean_cid,
-                    repo_url=clean_url,
-                    claimed_skills=skills_list if skills_list else ["Python"],
-                    description=clean_desc,
-                    resume_text=st.session_state.get("uploaded_resume_text"),
-                    resume_filename=st.session_state.get("uploaded_resume_name"),
-                    resume_skills=st.session_state.get("resume_extracted_skills"),
-                )
-                if ok and res.get("session_id"):
-                    real_sid = res["session_id"]
-                    st.session_state["active_session_id"] = real_sid
-                    time.sleep(1.5)
-                    ok_s, s_data, _ = api_client.get_session(real_sid)
-                    if ok_s and s_data:
-                        SessionManager.set_session(s_data)
+            # Also inform live backend daemon
+            if is_live:
+                try:
+                    ok, res, err = api_client.start_analysis(
+                        candidate_id=clean_cid,
+                        repo_url=clean_url,
+                        claimed_skills=skills_list if skills_list else ["Python"],
+                        description=clean_desc,
+                        resume_text=st.session_state.get("uploaded_resume_text"),
+                        resume_filename=st.session_state.get("uploaded_resume_name"),
+                        resume_skills=st.session_state.get("resume_extracted_skills"),
+                    )
+                    if ok and res.get("session_id"):
+                        st.session_state["active_session_id"] = res["session_id"]
+                except Exception:
+                    pass
 
         st.rerun()
 
