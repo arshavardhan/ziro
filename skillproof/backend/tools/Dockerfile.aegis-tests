@@ -1,0 +1,4 @@
+# Trusted, manually chosen test image. Never installs candidate setup scripts.
+FROM python:3.11-slim
+RUN pip install --no-cache-dir pytest==8.3.5 numpy==2.2.6 pandas==2.2.3 pydantic==2.11.7 scikit-learn==1.6.1
+USER 65534:65534

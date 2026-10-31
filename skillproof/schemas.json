@@ -1,0 +1,2820 @@
+{
+  "AgentCycle": {
+    "properties": {
+      "cycle_number": {
+        "type": "integer",
+        "title": "Cycle Number"
+      },
+      "started_at": {
+        "type": "string",
+        "title": "Started At"
+      },
+      "finished_at": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Finished At"
+      },
+      "plan": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Plan"
+      },
+      "decision_summary": {
+        "type": "string",
+        "title": "Decision Summary"
+      },
+      "selected_tools": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Selected Tools"
+      },
+      "executions": {
+        "items": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "type": "array",
+        "title": "Executions",
+        "default": []
+      },
+      "observations": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Observations",
+        "default": {}
+      },
+      "replanning_decision": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Replanning Decision"
+      },
+      "stop_reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Stop Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "cycle_number",
+      "started_at",
+      "plan",
+      "decision_summary",
+      "selected_tools"
+    ],
+    "title": "AgentCycle"
+  },
+  "AnalyzeRequest": {
+    "properties": {
+      "github_url": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Github Url"
+      },
+      "repo_url": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Repo Url"
+      },
+      "candidate_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "pattern": "^[\\w-]+$",
+        "title": "Candidate Id"
+      },
+      "claimed_skills": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "minItems": 1,
+        "title": "Claimed Skills"
+      },
+      "commit_sha": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{40}$"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Commit Sha"
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Description"
+      },
+      "resume_text": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resume Text"
+      },
+      "resume_filename": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resume Filename"
+      },
+      "resume_skills": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Resume Skills"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "AnalyzeRequest"
+  },
+  "AnalyzeResponse": {
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "title": "Session Id"
+      },
+      "status": {
+        "type": "string",
+        "const": "QUEUED",
+        "title": "Status",
+        "default": "QUEUED"
+      },
+      "message": {
+        "type": "string",
+        "title": "Message",
+        "default": "Analysis queued"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "session_id"
+    ],
+    "title": "AnalyzeResponse"
+  },
+  "AnswerRequest": {
+    "properties": {
+      "question_id": {
+        "type": "string",
+        "title": "Question Id"
+      },
+      "answer": {
+        "type": "string",
+        "maxLength": 8000,
+        "minLength": 1,
+        "title": "Answer"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "question_id",
+      "answer"
+    ],
+    "title": "AnswerRequest"
+  },
+  "AnswerResponse": {
+    "properties": {
+      "question_id": {
+        "type": "string",
+        "title": "Question Id"
+      },
+      "answer": {
+        "type": "string",
+        "title": "Answer"
+      },
+      "evaluation": {
+        "$ref": "#/components/schemas/VivaEvaluation"
+      },
+      "weighted_score": {
+        "type": "number",
+        "title": "Weighted Score"
+      },
+      "follow_up": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/Question"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "current_status": {
+        "type": "string",
+        "title": "Current Status"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "question_id",
+      "answer",
+      "evaluation",
+      "weighted_score",
+      "current_status"
+    ],
+    "title": "AnswerResponse"
+  },
+  "ApprovalRequest": {
+    "properties": {
+      "approved": {
+        "type": "boolean",
+        "title": "Approved"
+      },
+      "reviewer": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Reviewer"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "approved",
+      "reviewer",
+      "reason"
+    ],
+    "title": "ApprovalRequest"
+  },
+  "ApprovalResponse": {
+    "properties": {
+      "approval_status": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected"
+        ],
+        "title": "Approval Status"
+      },
+      "current_status": {
+        "$ref": "#/components/schemas/Status"
+      },
+      "reviewer": {
+        "type": "string",
+        "title": "Reviewer"
+      },
+      "reason": {
+        "type": "string",
+        "title": "Reason"
+      },
+      "timestamp": {
+        "type": "string",
+        "title": "Timestamp"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "approval_status",
+      "current_status",
+      "reviewer",
+      "reason",
+      "timestamp"
+    ],
+    "title": "ApprovalResponse"
+  },
+  "Assessment": {
+    "properties": {
+      "skill": {
+        "type": "string",
+        "title": "Skill"
+      },
+      "implementation_score": {
+        "anyOf": [
+          {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Implementation Score"
+      },
+      "architecture_score": {
+        "anyOf": [
+          {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Architecture Score"
+      },
+      "confidence": {
+        "type": "number",
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Confidence"
+      },
+      "supporting_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Supporting Evidence"
+      },
+      "missing_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Missing Evidence"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations"
+      },
+      "observed_facts": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Observed Facts"
+      },
+      "ai_inferences": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Ai Inferences"
+      },
+      "verdict": {
+        "type": "string",
+        "enum": [
+          "PARTIALLY_VERIFIED",
+          "INSUFFICIENT_EVIDENCE",
+          "NOT_DEMONSTRATED",
+          "VERIFIED"
+        ],
+        "title": "Verdict"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "skill",
+      "confidence",
+      "supporting_evidence",
+      "missing_evidence",
+      "limitations",
+      "observed_facts",
+      "ai_inferences",
+      "verdict"
+    ],
+    "title": "Assessment"
+  },
+  "BaselineRecord": {
+    "properties": {
+      "assessment_id": {
+        "type": "string",
+        "title": "Assessment Id"
+      },
+      "candidate_id": {
+        "type": "string",
+        "title": "Candidate Id"
+      },
+      "record_kind": {
+        "type": "string",
+        "title": "Record Kind"
+      },
+      "prior_assessment_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Prior Assessment Id"
+      },
+      "repository": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Repository"
+      },
+      "analysis": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Analysis"
+      },
+      "provenance": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Provenance"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "assessment_id",
+      "candidate_id",
+      "record_kind",
+      "repository",
+      "analysis",
+      "provenance"
+    ],
+    "title": "BaselineRecord"
+  },
+  "Body_attach_resume_to_session_api_session__session_id__resume_post": {
+    "properties": {
+      "file": {
+        "anyOf": [
+          {
+            "type": "string",
+            "contentMediaType": "application/octet-stream"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "File"
+      }
+    },
+    "type": "object",
+    "title": "Body_attach_resume_to_session_api_session__session_id__resume_post"
+  },
+  "Body_parse_resume_endpoint_api_resume_parse_post": {
+    "properties": {
+      "file": {
+        "anyOf": [
+          {
+            "type": "string",
+            "contentMediaType": "application/octet-stream"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "File"
+      }
+    },
+    "type": "object",
+    "title": "Body_parse_resume_endpoint_api_resume_parse_post"
+  },
+  "Credential": {
+    "properties": {
+      "credential_id": {
+        "type": "string",
+        "title": "Credential Id"
+      },
+      "candidate_id": {
+        "type": "string",
+        "title": "Candidate Id"
+      },
+      "repository_url": {
+        "type": "string",
+        "title": "Repository Url"
+      },
+      "repository_commit_sha": {
+        "type": "string",
+        "title": "Repository Commit Sha"
+      },
+      "verified_skills": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Verified Skills"
+      },
+      "skill_scores": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/SkillScore"
+        },
+        "type": "object",
+        "title": "Skill Scores"
+      },
+      "evidence_references": {
+        "additionalProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": "object",
+        "title": "Evidence References"
+      },
+      "viva_summary": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "type": "object",
+        "title": "Viva Summary"
+      },
+      "issued_timestamp": {
+        "type": "string",
+        "title": "Issued Timestamp"
+      },
+      "issuer": {
+        "type": "string",
+        "const": "SkillProof AI",
+        "title": "Issuer",
+        "default": "SkillProof AI"
+      },
+      "signature_algorithm": {
+        "type": "string",
+        "const": "HMAC-SHA256",
+        "title": "Signature Algorithm",
+        "default": "HMAC-SHA256"
+      },
+      "signature": {
+        "type": "string",
+        "title": "Signature"
+      },
+      "assessment_date": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Assessment Date"
+      },
+      "evidence_summary": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Evidence Summary",
+        "default": {}
+      },
+      "test_execution": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Test Execution",
+        "default": {}
+      },
+      "assessment_limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Assessment Limitations",
+        "default": []
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "credential_id",
+      "candidate_id",
+      "repository_url",
+      "repository_commit_sha",
+      "verified_skills",
+      "skill_scores",
+      "evidence_references",
+      "viva_summary",
+      "issued_timestamp",
+      "signature"
+    ],
+    "title": "Credential"
+  },
+  "ErrorDetail": {
+    "properties": {
+      "code": {
+        "type": "string",
+        "title": "Code"
+      },
+      "message": {
+        "type": "string",
+        "title": "Message"
+      },
+      "details": {
+        "items": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "type": "array",
+        "title": "Details",
+        "default": []
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "code",
+      "message"
+    ],
+    "title": "ErrorDetail"
+  },
+  "ErrorResponse": {
+    "properties": {
+      "error": {
+        "$ref": "#/components/schemas/ErrorDetail"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "error"
+    ],
+    "title": "ErrorResponse"
+  },
+  "EvaluationDisclosure": {
+    "properties": {
+      "evaluation_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Evaluation Id"
+      },
+      "evaluation_type": {
+        "type": "string",
+        "title": "Evaluation Type",
+        "default": "SYNTHETIC_REGRESSION"
+      },
+      "total_cases": {
+        "type": "integer",
+        "title": "Total Cases",
+        "default": 0
+      },
+      "passed": {
+        "type": "integer",
+        "title": "Passed",
+        "default": 0
+      },
+      "failed": {
+        "type": "integer",
+        "title": "Failed",
+        "default": 0
+      },
+      "result": {
+        "type": "string",
+        "title": "Result",
+        "default": "UNAVAILABLE"
+      },
+      "classification_metric_fixture_count": {
+        "type": "integer",
+        "title": "Classification Metric Fixture Count",
+        "default": 0
+      },
+      "classification_metrics": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Classification Metrics",
+        "default": {}
+      },
+      "real_world_accuracy_claim": {
+        "type": "boolean",
+        "title": "Real World Accuracy Claim",
+        "default": false
+      },
+      "evaluation_timestamp": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Evaluation Timestamp"
+      },
+      "limitations": {
+        "type": "string",
+        "title": "Limitations"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "limitations"
+    ],
+    "title": "EvaluationDisclosure"
+  },
+  "Evidence": {
+    "properties": {
+      "evidence_id": {
+        "type": "string",
+        "title": "Evidence Id"
+      },
+      "commit_sha": {
+        "type": "string",
+        "title": "Commit Sha"
+      },
+      "file": {
+        "type": "string",
+        "title": "File"
+      },
+      "line_start": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Line Start"
+      },
+      "line_end": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Line End"
+      },
+      "symbol": {
+        "type": "string",
+        "title": "Symbol"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "function",
+          "method",
+          "class",
+          "documentation",
+          "module"
+        ],
+        "title": "Kind"
+      },
+      "state": {
+        "$ref": "#/components/schemas/EvidenceState"
+      },
+      "signature": {
+        "type": "string",
+        "title": "Signature",
+        "default": ""
+      },
+      "type_hints": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Type Hints",
+        "default": []
+      },
+      "docstring": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Docstring"
+      },
+      "calls": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Calls",
+        "default": []
+      },
+      "imports": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Imports",
+        "default": []
+      },
+      "exceptions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Exceptions",
+        "default": []
+      },
+      "complexity": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Complexity"
+      },
+      "source": {
+        "type": "string",
+        "title": "Source"
+      },
+      "observed_facts": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Observed Facts",
+        "default": []
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations",
+        "default": []
+      },
+      "test_references": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Test References",
+        "default": []
+      },
+      "assessment_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Assessment Id"
+      },
+      "candidate_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Candidate Id"
+      },
+      "claimed_skills": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Claimed Skills",
+        "default": []
+      },
+      "evidence_type": {
+        "type": "string",
+        "enum": [
+          "CODE_IMPLEMENTATION",
+          "ARCHITECTURE",
+          "STATIC_ANALYSIS",
+          "TEST_DISCOVERY",
+          "TEST_EXECUTION",
+          "GIT_HISTORY",
+          "DOCUMENTATION",
+          "VIVA_RESPONSE"
+        ],
+        "title": "Evidence Type",
+        "default": "STATIC_ANALYSIS"
+      },
+      "collection_tool": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Collection Tool"
+      },
+      "collected_at": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Collected At"
+      },
+      "raw_observation": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Raw Observation",
+        "default": {}
+      },
+      "interpretation": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Interpretation"
+      },
+      "evidence_strength": {
+        "type": "string",
+        "title": "Evidence Strength",
+        "default": "UNASSESSED"
+      },
+      "verification_status": {
+        "type": "string",
+        "title": "Verification Status",
+        "default": "UNVERIFIED"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "evidence_id",
+      "commit_sha",
+      "file",
+      "line_start",
+      "line_end",
+      "symbol",
+      "kind",
+      "state",
+      "source"
+    ],
+    "title": "Evidence"
+  },
+  "EvidenceResponse": {
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "title": "Session Id"
+      },
+      "repository_commit_sha": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Repository Commit Sha"
+      },
+      "evidence": {
+        "items": {
+          "$ref": "#/components/schemas/Evidence"
+        },
+        "type": "array",
+        "title": "Evidence"
+      },
+      "relationships": {
+        "items": {
+          "$ref": "#/components/schemas/GraphEdge"
+        },
+        "type": "array",
+        "title": "Relationships"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "session_id",
+      "repository_commit_sha",
+      "evidence",
+      "relationships"
+    ],
+    "title": "EvidenceResponse"
+  },
+  "EvidenceState": {
+    "type": "string",
+    "enum": [
+      "IMPLEMENTED",
+      "TESTED",
+      "PARTIALLY_IMPLEMENTED",
+      "PLANNED",
+      "UNVERIFIED",
+      "NOT_DEMONSTRATED"
+    ],
+    "title": "EvidenceState"
+  },
+  "GitCommit": {
+    "properties": {
+      "sha": {
+        "type": "string",
+        "title": "Sha"
+      },
+      "author_name": {
+        "type": "string",
+        "title": "Author Name"
+      },
+      "author_email": {
+        "type": "string",
+        "title": "Author Email"
+      },
+      "timestamp": {
+        "type": "string",
+        "title": "Timestamp"
+      },
+      "message": {
+        "type": "string",
+        "title": "Message"
+      },
+      "changed_files": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Changed Files"
+      },
+      "additions": {
+        "type": "integer",
+        "title": "Additions"
+      },
+      "deletions": {
+        "type": "integer",
+        "title": "Deletions"
+      },
+      "test_modifications": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Test Modifications"
+      },
+      "documentation_modifications": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Documentation Modifications"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "sha",
+      "author_name",
+      "author_email",
+      "timestamp",
+      "message",
+      "changed_files",
+      "additions",
+      "deletions",
+      "test_modifications",
+      "documentation_modifications"
+    ],
+    "title": "GitCommit"
+  },
+  "GitSummary": {
+    "properties": {
+      "commit_count": {
+        "type": "integer",
+        "title": "Commit Count",
+        "default": 0
+      },
+      "commits": {
+        "items": {
+          "$ref": "#/components/schemas/GitCommit"
+        },
+        "type": "array",
+        "title": "Commits",
+        "default": []
+      },
+      "file_introduction": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object",
+        "title": "File Introduction",
+        "default": {}
+      },
+      "anomalies": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Anomalies",
+        "default": []
+      },
+      "feature_progression": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Feature Progression",
+        "default": []
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations",
+        "default": []
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "GitSummary"
+  },
+  "GraphEdge": {
+    "properties": {
+      "source": {
+        "type": "string",
+        "title": "Source"
+      },
+      "target": {
+        "type": "string",
+        "title": "Target"
+      },
+      "relation": {
+        "type": "string",
+        "title": "Relation"
+      },
+      "file": {
+        "type": "string",
+        "title": "File"
+      },
+      "line": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Line"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "default": "static"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "source",
+      "target",
+      "relation",
+      "file"
+    ],
+    "title": "GraphEdge"
+  },
+  "HealthResponse": {
+    "properties": {
+      "status": {
+        "type": "string",
+        "const": "ok",
+        "title": "Status",
+        "default": "ok"
+      },
+      "contract_version": {
+        "type": "string",
+        "title": "Contract Version",
+        "default": "2.0"
+      },
+      "llm_configured": {
+        "type": "boolean",
+        "title": "Llm Configured"
+      },
+      "signing_configured": {
+        "type": "boolean",
+        "title": "Signing Configured"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "llm_configured",
+      "signing_configured"
+    ],
+    "title": "HealthResponse"
+  },
+  "Plan": {
+    "properties": {
+      "rationale": {
+        "type": "string",
+        "maxLength": 1500,
+        "title": "Rationale",
+        "description": "Concise decision summary, not private chain-of-thought"
+      },
+      "languages": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "title": "Languages"
+      },
+      "actions": {
+        "items": {
+          "$ref": "#/components/schemas/ToolAction"
+        },
+        "type": "array",
+        "maxItems": 8,
+        "title": "Actions"
+      },
+      "missing_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 15,
+        "title": "Missing Evidence"
+      },
+      "stop": {
+        "type": "boolean",
+        "title": "Stop",
+        "default": false
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "rationale"
+    ],
+    "title": "Plan"
+  },
+  "Question": {
+    "properties": {
+      "question_id": {
+        "type": "string",
+        "title": "Question Id"
+      },
+      "question": {
+        "type": "string",
+        "title": "Question"
+      },
+      "category": {
+        "type": "string",
+        "enum": [
+          "conceptual",
+          "implementation",
+          "debugging"
+        ],
+        "title": "Category"
+      },
+      "difficulty": {
+        "type": "string",
+        "enum": [
+          "easy",
+          "medium",
+          "hard"
+        ],
+        "title": "Difficulty"
+      },
+      "related_file": {
+        "type": "string",
+        "title": "Related File"
+      },
+      "related_function": {
+        "type": "string",
+        "title": "Related Function"
+      },
+      "expected_concepts": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Expected Concepts"
+      },
+      "evidence_reference": {
+        "type": "string",
+        "title": "Evidence Reference"
+      },
+      "evaluation_rubric": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object",
+        "title": "Evaluation Rubric"
+      },
+      "parent_question_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Parent Question Id"
+      },
+      "skill": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Skill"
+      },
+      "line_start": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Line Start"
+      },
+      "line_end": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Line End"
+      },
+      "related_evidence_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Related Evidence Ids",
+        "default": []
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "question_id",
+      "question",
+      "category",
+      "difficulty",
+      "related_file",
+      "related_function",
+      "expected_concepts",
+      "evidence_reference",
+      "evaluation_rubric"
+    ],
+    "title": "Question"
+  },
+  "QuestionsResponse": {
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "title": "Session Id"
+      },
+      "questions": {
+        "items": {
+          "$ref": "#/components/schemas/Question"
+        },
+        "type": "array",
+        "title": "Questions"
+      },
+      "answered_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Answered Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "session_id",
+      "questions",
+      "answered_ids"
+    ],
+    "title": "QuestionsResponse"
+  },
+  "ReportResponse": {
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "title": "Session Id"
+      },
+      "current_status": {
+        "$ref": "#/components/schemas/Status"
+      },
+      "repository_commit_sha": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Repository Commit Sha"
+      },
+      "skill_report": {
+        "items": {
+          "$ref": "#/components/schemas/SkillScore"
+        },
+        "type": "array",
+        "title": "Skill Report"
+      },
+      "evidence_references": {
+        "items": {
+          "$ref": "#/components/schemas/Evidence"
+        },
+        "type": "array",
+        "title": "Evidence References"
+      },
+      "test_results": {
+        "$ref": "#/components/schemas/TestResult"
+      },
+      "git_findings": {
+        "$ref": "#/components/schemas/GitSummary"
+      },
+      "similarity_findings": {
+        "items": {
+          "$ref": "#/components/schemas/SimilarityFinding"
+        },
+        "type": "array",
+        "title": "Similarity Findings"
+      },
+      "viva_evaluation": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/AnswerResponse"
+        },
+        "type": "object",
+        "title": "Viva Evaluation"
+      },
+      "missing_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Missing Evidence"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations"
+      },
+      "approval_status": {
+        "type": "string",
+        "title": "Approval Status"
+      },
+      "eligible_skills": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Eligible Skills"
+      },
+      "blocking_reasons": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Blocking Reasons"
+      },
+      "baseline": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/BaselineRecord"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "test_discovery": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/TestDiscovery"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "test_execution": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/TestExecution"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "synthetic_evaluation": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/EvaluationDisclosure"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "sections": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Sections",
+        "default": {}
+      },
+      "stop_reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Stop Reason"
+      },
+      "resume_info": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resume Info"
+      },
+      "resume_verification": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resume Verification"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "session_id",
+      "current_status",
+      "repository_commit_sha",
+      "skill_report",
+      "evidence_references",
+      "test_results",
+      "git_findings",
+      "similarity_findings",
+      "viva_evaluation",
+      "missing_evidence",
+      "limitations",
+      "approval_status",
+      "eligible_skills",
+      "blocking_reasons"
+    ],
+    "title": "ReportResponse"
+  },
+  "RepositorySnapshot": {
+    "properties": {
+      "repository_url": {
+        "type": "string",
+        "title": "Repository Url"
+      },
+      "commit_sha": {
+        "type": "string",
+        "title": "Commit Sha"
+      },
+      "captured_at": {
+        "type": "string",
+        "title": "Captured At"
+      },
+      "languages": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Languages"
+      },
+      "files": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Files"
+      },
+      "directory_tree": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Directory Tree"
+      },
+      "dependencies": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Dependencies"
+      },
+      "entry_points": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Entry Points"
+      },
+      "ci_workflows": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Ci Workflows"
+      },
+      "context": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object",
+        "title": "Context"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations"
+      },
+      "owner": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Owner"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Name"
+      },
+      "default_branch": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Default Branch"
+      },
+      "cloned_at": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Cloned At"
+      },
+      "file_hashes": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object",
+        "title": "File Hashes",
+        "default": {}
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "repository_url",
+      "commit_sha",
+      "captured_at",
+      "languages",
+      "files",
+      "directory_tree",
+      "dependencies",
+      "entry_points",
+      "ci_workflows",
+      "context",
+      "limitations"
+    ],
+    "title": "RepositorySnapshot"
+  },
+  "SessionResponse": {
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "title": "Session Id"
+      },
+      "candidate_id": {
+        "type": "string",
+        "title": "Candidate Id"
+      },
+      "github_url": {
+        "type": "string",
+        "title": "Github Url"
+      },
+      "claimed_skills": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Claimed Skills"
+      },
+      "current_status": {
+        "$ref": "#/components/schemas/Status"
+      },
+      "repository_commit_sha": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Repository Commit Sha"
+      },
+      "repository_snapshot": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/RepositorySnapshot"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "analysis_plan": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/Plan"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "agent_steps": {
+        "items": {
+          "$ref": "#/components/schemas/TimelineEvent"
+        },
+        "type": "array",
+        "title": "Agent Steps",
+        "default": []
+      },
+      "code_evidence": {
+        "items": {
+          "$ref": "#/components/schemas/Evidence"
+        },
+        "type": "array",
+        "title": "Code Evidence",
+        "default": []
+      },
+      "evidence_graph": {
+        "items": {
+          "$ref": "#/components/schemas/GraphEdge"
+        },
+        "type": "array",
+        "title": "Evidence Graph",
+        "default": []
+      },
+      "commit_summary": {
+        "$ref": "#/components/schemas/GitSummary"
+      },
+      "test_results": {
+        "$ref": "#/components/schemas/TestResult"
+      },
+      "similarity_findings": {
+        "items": {
+          "$ref": "#/components/schemas/SimilarityFinding"
+        },
+        "type": "array",
+        "title": "Similarity Findings",
+        "default": []
+      },
+      "assessments": {
+        "items": {
+          "$ref": "#/components/schemas/Assessment"
+        },
+        "type": "array",
+        "title": "Assessments",
+        "default": []
+      },
+      "skill_scores": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/SkillScore"
+        },
+        "type": "object",
+        "title": "Skill Scores",
+        "default": {}
+      },
+      "viva_questions": {
+        "items": {
+          "$ref": "#/components/schemas/Question"
+        },
+        "type": "array",
+        "title": "Viva Questions",
+        "default": []
+      },
+      "viva_responses": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/AnswerResponse"
+        },
+        "type": "object",
+        "title": "Viva Responses",
+        "default": {}
+      },
+      "approval_status": {
+        "type": "string",
+        "title": "Approval Status",
+        "default": "pending"
+      },
+      "approval": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ApprovalResponse"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "missing_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Missing Evidence",
+        "default": []
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations",
+        "default": []
+      },
+      "error": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Error"
+      },
+      "investigation_cycles": {
+        "type": "integer",
+        "title": "Investigation Cycles",
+        "default": 0
+      },
+      "llm_calls": {
+        "type": "integer",
+        "title": "Llm Calls",
+        "default": 0
+      },
+      "baseline": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/BaselineRecord"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "test_discovery": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/TestDiscovery"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "test_execution": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/TestExecution"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "synthetic_evaluation": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/EvaluationDisclosure"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "agent_cycles": {
+        "items": {
+          "$ref": "#/components/schemas/AgentCycle"
+        },
+        "type": "array",
+        "title": "Agent Cycles",
+        "default": []
+      },
+      "stop_reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Stop Reason"
+      },
+      "rag_indexed": {
+        "type": "boolean",
+        "title": "Rag Indexed",
+        "default": false
+      },
+      "rag_chunks_count": {
+        "type": "integer",
+        "title": "Rag Chunks Count",
+        "default": 0
+      },
+      "rag_evidence": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Rag Evidence",
+        "default": {}
+      },
+      "resume_info": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resume Info"
+      },
+      "resume_verification": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resume Verification"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "session_id",
+      "candidate_id",
+      "github_url",
+      "claimed_skills",
+      "current_status"
+    ],
+    "title": "SessionResponse"
+  },
+  "SimilarityFinding": {
+    "properties": {
+      "finding_id": {
+        "type": "string",
+        "title": "Finding Id"
+      },
+      "files": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Files"
+      },
+      "lines": {
+        "items": {
+          "type": "integer"
+        },
+        "type": "array",
+        "title": "Lines"
+      },
+      "similarity": {
+        "type": "number",
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Similarity"
+      },
+      "measure": {
+        "type": "string",
+        "title": "Measure"
+      },
+      "evidence": {
+        "type": "string",
+        "title": "Evidence"
+      },
+      "severity": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "title": "Severity"
+      },
+      "explanation": {
+        "type": "string",
+        "title": "Explanation"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "finding_id",
+      "files",
+      "lines",
+      "similarity",
+      "measure",
+      "evidence",
+      "severity",
+      "explanation",
+      "limitations"
+    ],
+    "title": "SimilarityFinding"
+  },
+  "SkillScore": {
+    "properties": {
+      "skill": {
+        "type": "string",
+        "title": "Skill"
+      },
+      "score": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Score"
+      },
+      "implementation_score": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Implementation Score"
+      },
+      "test_score": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Test Score"
+      },
+      "architecture_score": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Architecture Score"
+      },
+      "git_score": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Git Score"
+      },
+      "viva_score": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Viva Score"
+      },
+      "evidence_coverage": {
+        "type": "number",
+        "title": "Evidence Coverage"
+      },
+      "verdict": {
+        "type": "string",
+        "title": "Verdict"
+      },
+      "supporting_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Supporting Evidence"
+      },
+      "missing_evidence": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Missing Evidence"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations"
+      },
+      "status": {
+        "type": "string",
+        "title": "Status",
+        "default": "UNVERIFIED"
+      },
+      "evidence_dimensions": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Evidence Dimensions",
+        "default": {}
+      },
+      "traceability": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Traceability",
+        "default": {}
+      },
+      "scoring_weights": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "type": "object",
+        "title": "Scoring Weights",
+        "default": {}
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "skill",
+      "score",
+      "implementation_score",
+      "test_score",
+      "architecture_score",
+      "git_score",
+      "viva_score",
+      "evidence_coverage",
+      "verdict",
+      "supporting_evidence",
+      "missing_evidence",
+      "limitations"
+    ],
+    "title": "SkillScore"
+  },
+  "Status": {
+    "type": "string",
+    "enum": [
+      "QUEUED",
+      "PLANNING",
+      "ANALYSING",
+      "TESTING",
+      "EVALUATING",
+      "VIVA_PENDING",
+      "APPROVAL_PENDING",
+      "APPROVED",
+      "REJECTED",
+      "ISSUED",
+      "FAILED"
+    ],
+    "title": "Status"
+  },
+  "TestDiscovery": {
+    "properties": {
+      "status": {
+        "type": "string",
+        "title": "Status",
+        "default": "NOT_ATTEMPTED"
+      },
+      "definitions_discovered": {
+        "type": "integer",
+        "title": "Definitions Discovered",
+        "default": 0
+      },
+      "discovery_method": {
+        "type": "string",
+        "title": "Discovery Method",
+        "default": "STATIC_ANALYSIS"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations",
+        "default": [
+          "Definitions are not executed tests or a coverage measure."
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "TestDiscovery"
+  },
+  "TestExecution": {
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "NOT_ATTEMPTED",
+          "NOT_PERFORMED",
+          "BLOCKED",
+          "RUNNING",
+          "PASSED",
+          "FAILED",
+          "PARTIALLY_PASSED",
+          "TIMED_OUT",
+          "ERROR"
+        ],
+        "title": "Status",
+        "default": "NOT_ATTEMPTED"
+      },
+      "tests_executed": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Tests Executed",
+        "default": 0
+      },
+      "tests_passed": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Tests Passed",
+        "default": 0
+      },
+      "tests_failed": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Tests Failed",
+        "default": 0
+      },
+      "tests_skipped": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Tests Skipped",
+        "default": 0
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason"
+      },
+      "execution_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Execution Id"
+      },
+      "capability_check": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Capability Check"
+      },
+      "counts_source": {
+        "type": "string",
+        "title": "Counts Source",
+        "default": "NO_EXECUTION_RECORD"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "TestExecution"
+  },
+  "TestResult": {
+    "properties": {
+      "execution": {
+        "type": "string",
+        "enum": [
+          "NOT_PERFORMED",
+          "PERFORMED"
+        ],
+        "title": "Execution",
+        "default": "NOT_PERFORMED"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "NOT_PERFORMED",
+          "PASSED",
+          "FAILED",
+          "ERROR",
+          "TIMEOUT"
+        ],
+        "title": "Status",
+        "default": "NOT_PERFORMED"
+      },
+      "framework": {
+        "type": "string",
+        "title": "Framework",
+        "default": "pytest"
+      },
+      "discovered_tests": {
+        "type": "integer",
+        "title": "Discovered Tests",
+        "default": 0
+      },
+      "collected_tests": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Collected Tests"
+      },
+      "passed": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Passed"
+      },
+      "failed": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Failed"
+      },
+      "skipped": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Skipped"
+      },
+      "collection_errors": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Collection Errors"
+      },
+      "runtime_seconds": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Runtime Seconds"
+      },
+      "exit_code": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Exit Code"
+      },
+      "output": {
+        "type": "string",
+        "title": "Output",
+        "default": ""
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason"
+      },
+      "test_to_module": {
+        "items": {
+          "$ref": "#/components/schemas/GraphEdge"
+        },
+        "type": "array",
+        "title": "Test To Module",
+        "default": []
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Limitations",
+        "default": []
+      },
+      "execution_record": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Execution Record"
+      },
+      "capability_check": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Capability Check"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "TestResult"
+  },
+  "TimelineEvent": {
+    "properties": {
+      "event_id": {
+        "type": "string",
+        "title": "Event Id"
+      },
+      "sequence": {
+        "type": "integer",
+        "title": "Sequence"
+      },
+      "timestamp": {
+        "type": "string",
+        "title": "Timestamp"
+      },
+      "agent": {
+        "type": "string",
+        "title": "Agent"
+      },
+      "phase": {
+        "type": "string",
+        "title": "Phase"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "started",
+          "completed",
+          "failed",
+          "info"
+        ],
+        "title": "Status"
+      },
+      "observation": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Observation"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "event_id",
+      "sequence",
+      "timestamp",
+      "agent",
+      "phase",
+      "status",
+      "observation"
+    ],
+    "title": "TimelineEvent"
+  },
+  "TimelineResponse": {
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "title": "Session Id"
+      },
+      "events": {
+        "items": {
+          "$ref": "#/components/schemas/TimelineEvent"
+        },
+        "type": "array",
+        "title": "Events"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "session_id",
+      "events"
+    ],
+    "title": "TimelineResponse"
+  },
+  "ToolAction": {
+    "properties": {
+      "tool": {
+        "type": "string",
+        "enum": [
+          "inspect_files",
+          "trace_calls",
+          "find_tests"
+        ],
+        "title": "Tool"
+      },
+      "files": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 15,
+        "title": "Files"
+      },
+      "symbol": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 150
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Symbol"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 1000,
+        "title": "Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "tool",
+      "reason"
+    ],
+    "title": "ToolAction"
+  },
+  "VerificationResponse": {
+    "properties": {
+      "valid": {
+        "type": "boolean",
+        "title": "Valid"
+      },
+      "credential_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Credential Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "valid"
+    ],
+    "title": "VerificationResponse"
+  },
+  "VivaEvaluation": {
+    "properties": {
+      "technical_correctness": {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "title": "Technical Correctness"
+      },
+      "code_understanding": {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "title": "Code Understanding"
+      },
+      "reasoning": {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "title": "Reasoning"
+      },
+      "evidence_alignment": {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "title": "Evidence Alignment"
+      },
+      "limitations_awareness": {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "title": "Limitations Awareness"
+      },
+      "evidence_reference": {
+        "type": "string",
+        "title": "Evidence Reference"
+      },
+      "feedback": {
+        "type": "string",
+        "title": "Feedback"
+      },
+      "incomplete": {
+        "type": "boolean",
+        "title": "Incomplete"
+      },
+      "follow_up_question": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Follow Up Question"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "technical_correctness",
+      "code_understanding",
+      "reasoning",
+      "evidence_alignment",
+      "limitations_awareness",
+      "evidence_reference",
+      "feedback",
+      "incomplete"
+    ],
+    "title": "VivaEvaluation"
+  }
+}

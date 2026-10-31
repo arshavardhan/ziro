@@ -1,0 +1,306 @@
+[
+  {
+    "id": "TC-01",
+    "name": "Valid Implementation (AegisAI)",
+    "category": "Implementation Depth",
+    "candidate_id": "CAND-001",
+    "repo_url": "https://github.com/arshavardhan/AegisAi",
+    "claimed_skills": ["Python", "Machine Learning", "OOP"],
+    "expected_outcome": {
+      "ground_truth": 1,
+      "status": "VERIFIED",
+      "recommendation": "APPROVE",
+      "score": 94,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": true
+    },
+    "description": "Complete production-grade AI guardrail pipeline with Monte Carlo dropout and class-conditional Mahalanobis distances."
+  },
+  {
+    "id": "TC-02",
+    "name": "Documentation-Only Claim",
+    "category": "Evidence Verification",
+    "candidate_id": "CAND-DOC-02",
+    "repo_url": "https://github.com/synthetic-lab/markdown-specs-only",
+    "claimed_skills": ["Software Architecture", "Machine Learning"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "INSUFFICIENT_EVIDENCE",
+      "recommendation": "REJECT",
+      "score": 18,
+      "tool_success": true,
+      "test_success": false,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Extensive architectural markdown diagrams in README, but zero functional code implementation files or models."
+  },
+  {
+    "id": "TC-03",
+    "name": "Planned Feature (Roadmap Only)",
+    "category": "Implementation Depth",
+    "candidate_id": "CAND-PLN-03",
+    "repo_url": "https://github.com/synthetic-lab/roadmap-stubs",
+    "claimed_skills": ["API Development", "FastAPI"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "PLANNED",
+      "recommendation": "REJECT",
+      "score": 25,
+      "tool_success": true,
+      "test_success": false,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Functions contain only 'raise NotImplementedError' and 'TODO: v2 roadmap'. Marked as PLANNED rather than implemented."
+  },
+  {
+    "id": "TC-04",
+    "name": "Partial Implementation",
+    "category": "Implementation Depth",
+    "candidate_id": "CAND-PRT-04",
+    "repo_url": "https://github.com/synthetic-lab/half-built-parser",
+    "claimed_skills": ["Python", "OOP"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "PARTIALLY_VERIFIED",
+      "recommendation": "FLAG_FOR_REVIEW",
+      "score": 58,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Tokenization stage is fully implemented, but AST generator and execution stages are unwritten."
+  },
+  {
+    "id": "TC-05",
+    "name": "Passing Tests Suite",
+    "category": "Test Harness Verification",
+    "candidate_id": "CAND-TST-05",
+    "repo_url": "https://github.com/synthetic-lab/verified-crypto-engine",
+    "claimed_skills": ["Testing", "Python"],
+    "expected_outcome": {
+      "ground_truth": 1,
+      "status": "VERIFIED",
+      "recommendation": "APPROVE",
+      "score": 92,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": true
+    },
+    "description": "100% test pass rate across 24 pytest unit, integration, and fuzz test cases."
+  },
+  {
+    "id": "TC-06",
+    "name": "Failing Tests Suite",
+    "category": "Test Harness Verification",
+    "candidate_id": "CAND-TST-06",
+    "repo_url": "https://github.com/synthetic-lab/broken-gateway",
+    "claimed_skills": ["Testing", "API Development"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "REJECTED",
+      "recommendation": "REJECT",
+      "score": 38,
+      "tool_success": true,
+      "test_success": false,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "7 of 11 pytest test cases fail due to uncaught 500 exceptions and schema mismatches."
+  },
+  {
+    "id": "TC-07",
+    "name": "Missing Tests",
+    "category": "Test Harness Verification",
+    "candidate_id": "CAND-TST-07",
+    "repo_url": "https://github.com/synthetic-lab/untested-script",
+    "claimed_skills": ["Testing"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "NOT_DEMONSTRATED",
+      "recommendation": "REJECT",
+      "score": 10,
+      "tool_success": true,
+      "test_success": false,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Candidate claimed advanced automated testing, but repository contains zero test files or test runner configs."
+  },
+  {
+    "id": "TC-08",
+    "name": "Invalid Repository URL",
+    "category": "Edge Case & Ingestion",
+    "candidate_id": "CAND-ERR-08",
+    "repo_url": "https://notgithub.com/nonexistent/missing-project-404",
+    "claimed_skills": ["Python"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "ERROR_HANDLED",
+      "recommendation": "REJECT",
+      "score": 0,
+      "tool_success": false,
+      "test_success": false,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Target repository returns 404/DNS error; agent gracefully reports error without crashing."
+  },
+  {
+    "id": "TC-09",
+    "name": "Empty Repository",
+    "category": "Edge Case & Ingestion",
+    "candidate_id": "CAND-EMP-09",
+    "repo_url": "https://github.com/synthetic-lab/blank-repo",
+    "claimed_skills": ["Python", "OOP"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "INSUFFICIENT_EVIDENCE",
+      "recommendation": "REJECT",
+      "score": 0,
+      "tool_success": true,
+      "test_success": false,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Empty git workspace with no code files; triggers insufficient evidence determination."
+  },
+  {
+    "id": "TC-10",
+    "name": "Large Initial Commit (Bulk Dump)",
+    "category": "Git Forensics",
+    "candidate_id": "CAND-GIT-10",
+    "repo_url": "https://github.com/synthetic-lab/bulk-dumped-code",
+    "claimed_skills": ["Git/GitHub", "Software Architecture"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "FLAGGED",
+      "recommendation": "FLAG_FOR_REVIEW",
+      "score": 54,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Entire 35,000-line codebase committed in a single initial commit 1 hour before submission deadline."
+  },
+  {
+    "id": "TC-11",
+    "name": "Incremental Authentic Commits",
+    "category": "Git Forensics",
+    "candidate_id": "CAND-GIT-11",
+    "repo_url": "https://github.com/synthetic-lab/distributed-raft",
+    "claimed_skills": ["Git/GitHub"],
+    "expected_outcome": {
+      "ground_truth": 1,
+      "status": "VERIFIED",
+      "recommendation": "APPROVE",
+      "score": 93,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": true
+    },
+    "description": "18 chronological commits spanning 4 weeks with descriptive semantic commit messages and natural refactoring diffs."
+  },
+  {
+    "id": "TC-12",
+    "name": "Duplicate Code Pattern Indicator",
+    "category": "Originality Analysis",
+    "candidate_id": "CAND-ORG-12",
+    "repo_url": "https://github.com/synthetic-lab/cloned-tutorial-blog",
+    "claimed_skills": ["Python", "Machine Learning"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "FLAGGED",
+      "recommendation": "FLAG_FOR_REVIEW",
+      "score": 50,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "AST fingerprint matches public tutorial blog verbatim; flagged as potential similarity indicator for human review."
+  },
+  {
+    "id": "TC-13",
+    "name": "Correct Technical Viva Explanation",
+    "category": "Technical Viva",
+    "candidate_id": "CAND-VIV-13",
+    "repo_url": "https://github.com/arshavardhan/AegisAi",
+    "claimed_skills": ["Machine Learning"],
+    "expected_outcome": {
+      "ground_truth": 1,
+      "status": "VERIFIED",
+      "recommendation": "APPROVE",
+      "score": 96,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": true
+    },
+    "description": "Candidate accurately articulates Monte Carlo variational dropout principles matching exact code implementation."
+  },
+  {
+    "id": "TC-14",
+    "name": "Incorrect / Contradictory Viva",
+    "category": "Technical Viva",
+    "candidate_id": "CAND-VIV-14",
+    "repo_url": "https://github.com/synthetic-lab/complex-engine",
+    "claimed_skills": ["Machine Learning"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "REJECTED",
+      "recommendation": "REJECT",
+      "score": 40,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Candidate gave generic AI answers that directly contradicted the algorithm architecture present in the codebase."
+  },
+  {
+    "id": "TC-15",
+    "name": "Missing Reviewer Approval Gate",
+    "category": "Governance & Guardrails",
+    "candidate_id": "CAND-GOV-15",
+    "repo_url": "https://github.com/synthetic-lab/high-score-unapproved",
+    "claimed_skills": ["Python"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "PENDING_APPROVAL",
+      "recommendation": "PENDING",
+      "score": 90,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "High automated evidence score, but human reviewer has not yet signed off. Credential issuance strictly locked."
+  },
+  {
+    "id": "TC-16",
+    "name": "Tampered Credential Payload",
+    "category": "Cryptographic Integrity",
+    "candidate_id": "CAND-SEC-16",
+    "repo_url": "https://github.com/arshavardhan/AegisAi",
+    "claimed_skills": ["Machine Learning"],
+    "expected_outcome": {
+      "ground_truth": 0,
+      "status": "INVALID_SIGNATURE",
+      "recommendation": "REJECT",
+      "score": 0,
+      "tool_success": true,
+      "test_success": true,
+      "guardrail_success": true,
+      "signature_valid": false
+    },
+    "description": "Modified JSON field (score elevated from 75 to 99); cryptographic HMAC-SHA256 signature mismatch detected."
+  }
+]

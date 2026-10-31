@@ -1,0 +1,34 @@
+# Python & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+.deps/
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Application State & Workspaces
+skillproof/backend/outputs/*
+!skillproof/backend/outputs/.gitkeep
+skillproof/backend/workspaces/*
+!skillproof/backend/workspaces/.gitkeep
+skillproof/backend/credentials/*
+!skillproof/backend/credentials/.gitkeep
+demo_repository/
+ziro-front-end-main/
+temp_*
+*.log
+
+# SQLite journals
+*.sqlite3-journal

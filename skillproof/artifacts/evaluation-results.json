@@ -1,0 +1,207 @@
+{
+  "label": "SYNTHETIC DETERMINISTIC EVALUATION \u2014 not a live LLM accuracy benchmark",
+  "metrics": {
+    "classification": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "sample_count": 6,
+      "confusion_matrix": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4
+      }
+    },
+    "regression_pass_rate": 1.0,
+    "tool_success_rate": 1.0,
+    "test_execution_success": null,
+    "test_execution_success_explanation": "No candidate code executed in evaluation; pytest-output cases are synthetic parser fixtures. Live sandbox execution unavailable.",
+    "synthetic_test_result_handling": 1.0,
+    "guardrail_enforcement": 1.0,
+    "credential_verification_rate": 1.0,
+    "denominators": {
+      "tool_calls": 22,
+      "guardrail_negative_cases": 4,
+      "credential_cases": 2,
+      "actual_test_executions": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "implemented",
+      "kind": "implementation",
+      "source": "def square(x):\n    return x*x\n",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "document_only",
+      "kind": "documentation",
+      "source": "Machine learning, architecture and testing are supported.",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "planned",
+      "kind": "implementation",
+      "source": "def planned():\n    raise NotImplementedError()\n",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "partial",
+      "kind": "implementation",
+      "source": "def partial(x):\n    if x: return x\n    raise NotImplementedError()\n",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "empty",
+      "kind": "implementation",
+      "source": "",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "validated_implementation",
+      "kind": "implementation",
+      "source": "def positive(x):\n    if x<0: raise ValueError('negative')\n    return x\n",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "passing_tests",
+      "kind": "test_output",
+      "output": "3 passed in 0.2s",
+      "exit_code": 0,
+      "expected": "PASSED",
+      "actual": "PASSED",
+      "passed": true
+    },
+    {
+      "id": "failing_tests",
+      "kind": "test_output",
+      "output": "1 failed, 2 passed in 0.2s",
+      "exit_code": 1,
+      "expected": "FAILED",
+      "actual": "FAILED",
+      "passed": true
+    },
+    {
+      "id": "collection_error",
+      "kind": "test_output",
+      "output": "1 error in 0.2s",
+      "exit_code": 2,
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "passed": true
+    },
+    {
+      "id": "missing_tests",
+      "kind": "missing_tests",
+      "expected": "NOT_PERFORMED",
+      "actual": "NOT_PERFORMED",
+      "passed": true
+    },
+    {
+      "id": "invalid_repository",
+      "kind": "url",
+      "value": "http://localhost/private",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "valid_repository",
+      "kind": "url",
+      "value": "https://github.com/example/repository",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "path_traversal",
+      "kind": "path",
+      "value": "../private.py",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "secret_file",
+      "kind": "path",
+      "value": ".env.production",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "large_initial_commit",
+      "kind": "large_commit",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "incremental_commits",
+      "kind": "incremental",
+      "expected": 3,
+      "actual": 3,
+      "passed": true
+    },
+    {
+      "id": "duplicate_code",
+      "kind": "duplicate",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "incorrect_viva",
+      "kind": "viva",
+      "score": 15,
+      "expected": 15,
+      "actual": 15.0,
+      "passed": true
+    },
+    {
+      "id": "correct_viva",
+      "kind": "viva",
+      "score": 90,
+      "expected": 90,
+      "actual": 90.0,
+      "passed": true
+    },
+    {
+      "id": "missing_approval",
+      "kind": "approval",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "valid_credential",
+      "kind": "credential",
+      "tamper": false,
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "tampered_credential",
+      "kind": "credential",
+      "tamper": true,
+      "expected": false,
+      "actual": false,
+      "passed": true
+    }
+  ]
+}

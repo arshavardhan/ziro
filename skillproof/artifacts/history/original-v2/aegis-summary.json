@@ -1,0 +1,42 @@
+{
+  "session_id": "25b09616-1cea-4b7d-8f9f-a53359c8f800",
+  "commit_sha": "79112160653cc38cdcbddaf578e29ecfbd58a70a",
+  "files": 52,
+  "evidence_items": 383,
+  "commits": 33,
+  "discovered_tests": 121,
+  "test_execution": "NOT_PERFORMED",
+  "similarity_findings": 43,
+  "entropy_value_trace": [
+    {
+      "source": "ev-d2bc7d6ec270f3d65e17",
+      "target": "ev-d0a3fcfddd4f985628aa",
+      "relation": "PASSES_VALUE:entropy",
+      "file": "aegis/core/pipeline.py",
+      "line": 214,
+      "resolution": "static_assignment_heuristic",
+      "source_symbol": "EntropyEstimator.compute",
+      "target_symbol": "TrustScorer.compute"
+    },
+    {
+      "source": "ev-9c475c1c80d62df58107",
+      "target": "ev-d0a3fcfddd4f985628aa",
+      "relation": "PASSES_VALUE:entropy",
+      "file": "aegis/core/pipeline.py",
+      "line": 214,
+      "resolution": "static_assignment_heuristic",
+      "source_symbol": "PredictionPipeline._validate_probabilities",
+      "target_symbol": "TrustScorer.compute"
+    },
+    {
+      "source": "ev-1a08c0cf160d7459806d",
+      "target": "ev-d0a3fcfddd4f985628aa",
+      "relation": "PASSES_VALUE:entropy",
+      "file": "aegis/core/pipeline.py",
+      "line": 214,
+      "resolution": "static_assignment_heuristic",
+      "source_symbol": "PredictionPipeline._validate_predictions",
+      "target_symbol": "TrustScorer.compute"
+    }
+  ]
+}

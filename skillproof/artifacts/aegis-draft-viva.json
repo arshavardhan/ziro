@@ -1,0 +1,116 @@
+{
+  "provenance": "Human-authored draft grounded in inspected source; not live LLM output",
+  "commit_sha": "79112160653cc38cdcbddaf578e29ecfbd58a70a",
+  "questions": [
+    {
+      "question_id": "q1",
+      "question": "Why divide Shannon entropy by log2(number of classes), and how does this implementation handle zero probabilities?",
+      "category": "conceptual",
+      "difficulty": "medium",
+      "related_file": "aegis/uncertainty/entropy.py",
+      "related_function": "EntropyEstimator.compute",
+      "expected_concepts": [
+        "normalization",
+        "zero probability limit",
+        "validation"
+      ],
+      "evidence_reference": "ev-d2bc7d6ec270f3d65e17",
+      "evaluation_rubric": {
+        "technical_correctness": "30%: accurate source behavior",
+        "code_understanding": "25%: trace actual statements",
+        "reasoning": "20%: justify approach",
+        "evidence_alignment": "15%: cite source",
+        "limitations_awareness": "10%: identify limits"
+      },
+      "parent_question_id": null
+    },
+    {
+      "question_id": "q2",
+      "question": "Why does the aggregator use 1 minus uncertainty and OOD risk? Explain the meaning and limits of this score.",
+      "category": "conceptual",
+      "difficulty": "medium",
+      "related_file": "aegis/scoring/aggregator.py",
+      "related_function": "ScoreAggregator.aggregate",
+      "expected_concepts": [
+        "risk direction",
+        "weighted sum",
+        "uncalibrated heuristic"
+      ],
+      "evidence_reference": "ev-812d5b1e2ff6a5539e7c",
+      "evaluation_rubric": {
+        "technical_correctness": "30%: accurate source behavior",
+        "code_understanding": "25%: trace actual statements",
+        "reasoning": "20%: justify approach",
+        "evidence_alignment": "15%: cite source",
+        "limitations_awareness": "10%: identify limits"
+      },
+      "parent_question_id": null
+    },
+    {
+      "question_id": "q3",
+      "question": "Trace the entropy array from computation through the per-sample uncertainty variable into trust.compute. What checks protect array alignment?",
+      "category": "implementation",
+      "difficulty": "medium",
+      "related_file": "aegis/core/pipeline.py",
+      "related_function": "PredictionPipeline.predict_batch",
+      "expected_concepts": [
+        "metric shapes",
+        "sample indexing",
+        "entropy argument"
+      ],
+      "evidence_reference": "ev-eea487d8820293f52ac3",
+      "evaluation_rubric": {
+        "technical_correctness": "30%: accurate source behavior",
+        "code_understanding": "25%: trace actual statements",
+        "reasoning": "20%: justify approach",
+        "evidence_alignment": "15%: cite source",
+        "limitations_awareness": "10%: identify limits"
+      },
+      "parent_question_id": null
+    },
+    {
+      "question_id": "q4",
+      "question": "How does is_ood affect normalized_ood, and what happens when drift_score is None?",
+      "category": "implementation",
+      "difficulty": "medium",
+      "related_file": "aegis/scoring/trust.py",
+      "related_function": "TrustScorer.compute",
+      "expected_concepts": [
+        "hard OOD signal",
+        "optional drift",
+        "ScoreInputs"
+      ],
+      "evidence_reference": "ev-d0a3fcfddd4f985628aa",
+      "evaluation_rubric": {
+        "technical_correctness": "30%: accurate source behavior",
+        "code_understanding": "25%: trace actual statements",
+        "reasoning": "20%: justify approach",
+        "evidence_alignment": "15%: cite source",
+        "limitations_awareness": "10%: identify limits"
+      },
+      "parent_question_id": null
+    },
+    {
+      "question_id": "q5",
+      "question": "A wrapper returns an N-by-1 matrix of ones. Why does validation reject it, and how would you design a compatible wrapper?",
+      "category": "debugging",
+      "difficulty": "medium",
+      "related_file": "aegis/core/pipeline.py",
+      "related_function": "PredictionPipeline._validate_probabilities",
+      "expected_concepts": [
+        "two-class minimum",
+        "probability semantics",
+        "shape validation"
+      ],
+      "evidence_reference": "ev-9c475c1c80d62df58107",
+      "evaluation_rubric": {
+        "technical_correctness": "30%: accurate source behavior",
+        "code_understanding": "25%: trace actual statements",
+        "reasoning": "20%: justify approach",
+        "evidence_alignment": "15%: cite source",
+        "limitations_awareness": "10%: identify limits"
+      },
+      "parent_question_id": null
+    }
+  ]
+}

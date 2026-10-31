@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "INVALID_STATE",
+    "message": "Explicit human approval required; rejection blocks issuance",
+    "details": []
+  }
+}
