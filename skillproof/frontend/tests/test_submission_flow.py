@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from services.validators import validate_github_url, validate_candidate_id
-from services.session_manager import SessionManager, get_empty_session, get_default_aegis_session
+from services.session_manager import SessionManager, get_empty_session
 from services.api_client import APIClient
 
 

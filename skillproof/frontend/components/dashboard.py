@@ -1,8 +1,14 @@
+import time
 import urllib.parse
 import streamlit as st
 import plotly.graph_objects as go
 from services.session_manager import SessionManager
-from services.validators import validate_candidate_id, validate_github_url, extract_github_repo_info
+from services.validators import (
+    validate_candidate_id,
+    validate_github_url,
+    extract_github_repo_info,
+    generate_candidate_id_from_repo,
+)
 from services.api_client import APIClient
 from config import DEFAULT_BACKEND_URL, SUPPORTED_SKILLS
 
@@ -79,23 +85,50 @@ def render_overview_dashboard():
     )
 
     # Section 1: GitHub Repository Target & Candidate Identity
-    st.markdown("<p style='font-weight: 700; color: #60A5FA; font-size: 0.95rem; margin-bottom: 6px;'>🔗 SECTION 1: Target Repository & Candidate Identity</p>", unsafe_allow_html=True)
-    col_cid, col_url = st.columns([1, 2.5])
-    with col_cid:
-        candidate_id_input = st.text_input(
-            "Candidate ID *",
-            value=st.session_state.get("input_candidate_id", ""),
-            placeholder="e.g. CAND-1024",
-            help="Required unique identifier for the candidate being verified",
-            key="field_candidate_id",
-        )
+    st.markdown("<p style='font-weight: 700; color: #60A5FA; font-size: 0.95rem; margin-bottom: 6px;'>🔗 SECTION 1: Target Repository & Auto-Generated Candidate Identity</p>", unsafe_allow_html=True)
+
+    def on_dashboard_repo_change():
+        url = st.session_state.get("field_repo_url", "").strip()
+        if url:
+            auto_id = generate_candidate_id_from_repo(url)
+            if auto_id:
+                st.session_state["field_candidate_id"] = auto_id
+                st.session_state["input_candidate_id"] = auto_id
+                st.session_state["selected_candidate_id"] = auto_id
+
+    col_url, col_cid = st.columns([2, 1.3])
     with col_url:
         repo_url_input = st.text_input(
             "GitHub Repository URL *",
             value=st.session_state.get("input_repo_url", ""),
             placeholder="https://github.com/username/repository",
-            help="Required public HTTPS GitHub repository URL (e.g. https://github.com/username/repository)",
+            help="Public HTTPS GitHub repository URL (Candidate Profile ID is auto-generated from this link)",
             key="field_repo_url",
+            on_change=on_dashboard_repo_change,
+        )
+    with col_cid:
+        current_cid = st.session_state.get("field_candidate_id") or st.session_state.get("input_candidate_id", "")
+        if not current_cid and repo_url_input:
+            current_cid = generate_candidate_id_from_repo(repo_url_input)
+            st.session_state["field_candidate_id"] = current_cid
+            st.session_state["input_candidate_id"] = current_cid
+
+        candidate_id_input = st.text_input(
+            "Candidate Profile ID * (Auto-Generated)",
+            value=current_cid,
+            placeholder="Auto-derived from repository URL",
+            help="Unique identifier auto-derived from your repository link (editable)",
+            key="field_candidate_id",
+        )
+
+    if repo_url_input and candidate_id_input:
+        st.markdown(
+            f"""
+            <div style="font-size: 0.78rem; color: #60A5FA; margin-top: -6px; margin-bottom: 10px;">
+                ⚡ <b>Profile Linked:</b> Candidate ID <code>{candidate_id_input}</code> auto-derived from repository URL.
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     # Section 2: Candidate Resume Upload & Skill Extraction
@@ -255,14 +288,21 @@ def render_overview_dashboard():
 
     # Action 3: PREPARE VERIFICATION (Frontend interaction only — Zero fake data, zero backend calls)
     if prepare_clicked:
+        clean_url = repo_url_input.strip() if repo_url_input else ""
+        clean_cid = candidate_id_input.strip() if candidate_id_input else ""
+        if not clean_cid and clean_url:
+            clean_cid = generate_candidate_id_from_repo(clean_url)
+            st.session_state["field_candidate_id"] = clean_cid
+            st.session_state["input_candidate_id"] = clean_cid
+
         # Validate Candidate ID
-        is_valid_cid, cid_err = validate_candidate_id(candidate_id_input)
+        is_valid_cid, cid_err = validate_candidate_id(clean_cid)
         if not is_valid_cid:
             st.error(f"Candidate ID Validation Error: {cid_err}")
             return
 
         # Validate GitHub Repository URL
-        is_valid_url, url_err = validate_github_url(repo_url_input)
+        is_valid_url, url_err = validate_github_url(clean_url)
         if not is_valid_url:
             st.error(f"Repository URL Validation Error: {url_err}")
             return
@@ -295,12 +335,12 @@ def render_overview_dashboard():
         st.session_state["input_claimed_skills"] = claimed_skills_input
         st.session_state["input_description"] = clean_desc
 
-        # Update active session with clean prepared state (clearing older repo details)
-        SessionManager.set_session({
+        # Prepare initial session
+        initial_sess = {
             "session_id": f"prep_{clean_cid}",
             "candidate_id": clean_cid,
             "repo_url": clean_url,
-            "claimed_skills": skills_list,
+            "claimed_skills": skills_list if skills_list else ["Python"],
             "description": clean_desc,
             "status": "PREPARED",
             "approval_status": "pending",
@@ -318,7 +358,28 @@ def render_overview_dashboard():
             "credential": {},
             "resume_info": st.session_state.get("parsed_resume_profile"),
             "resume_skills": st.session_state.get("resume_extracted_skills", []),
-        })
+        }
+        SessionManager.set_session(initial_sess)
+
+        # If backend is connected, launch pipeline immediately
+        if is_live:
+            with st.spinner(f"🚀 Launching autonomous verification on {clean_url}..."):
+                ok, res, err = api_client.start_analysis(
+                    candidate_id=clean_cid,
+                    repo_url=clean_url,
+                    claimed_skills=skills_list if skills_list else ["Python"],
+                    description=clean_desc,
+                    resume_text=st.session_state.get("uploaded_resume_text"),
+                    resume_filename=st.session_state.get("uploaded_resume_name"),
+                    resume_skills=st.session_state.get("resume_extracted_skills"),
+                )
+                if ok and res.get("session_id"):
+                    real_sid = res["session_id"]
+                    st.session_state["active_session_id"] = real_sid
+                    time.sleep(1.5)
+                    ok_s, s_data, _ = api_client.get_session(real_sid)
+                    if ok_s and s_data:
+                        SessionManager.set_session(s_data)
 
         st.rerun()
 

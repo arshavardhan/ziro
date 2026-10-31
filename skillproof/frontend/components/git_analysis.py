@@ -41,8 +41,30 @@ def render_git_forensics():
     )
 
     if not commits:
-        st.info("No git commit forensics available. Commit history will be inspected during backend repository verification.")
-        return
+        active_sid = st.session_state.get("active_session_id")
+        from services.api_client import APIClient
+        from config import DEFAULT_BACKEND_URL
+        api_client = APIClient(base_url=st.session_state.get("backend_url", DEFAULT_BACKEND_URL), timeout=5)
+
+        if active_sid:
+            ok, s_data, _ = api_client.get_session(active_sid)
+            if ok and s_data:
+                SessionManager.set_session(s_data)
+                commits = s_data.get("git_commits", [])
+
+        if not commits:
+            st.info("No git commit forensics available yet for this repository.")
+            if repo_url and st.button("🚀 Analyze Git History & Forensics Now", key="btn_analyze_git_now"):
+                with st.spinner("Extracting git history & commit cadence..."):
+                    ok, res, _ = api_client.start_analysis(
+                        candidate_id=cand_id or "CANDIDATE",
+                        repo_url=repo_url,
+                        claimed_skills=["Git/GitHub", "Python"],
+                    )
+                    if ok and res.get("session_id"):
+                        st.session_state["active_session_id"] = res["session_id"]
+                        st.rerun()
+            return
 
     # Plotly Charts: Commit Size & Diff Distribution
     c_chart1, c_chart2 = st.columns([1.2, 1])

@@ -6,7 +6,20 @@ def render_originality_analysis():
     """Render Originality and Code Similarity audit interface with responsible language and zero synthetic data."""
     session = SessionManager.get_session()
     report = session.get("originality_report", {})
-    findings = session.get("originality_findings", [])
+    findings = session.get("originality_findings", []) or session.get("similarity_findings", [])
+    cand_id = session.get("candidate_id") or st.session_state.get("selected_candidate_id", "")
+    repo_url = session.get("selected_repository_url") or session.get("repo_url", "")
+
+    active_sid = st.session_state.get("active_session_id")
+    if not findings and active_sid:
+        from services.api_client import APIClient
+        from config import DEFAULT_BACKEND_URL
+        api_client = APIClient(base_url=st.session_state.get("backend_url", DEFAULT_BACKEND_URL), timeout=5)
+        ok, s_data, _ = api_client.get_session(active_sid)
+        if ok and s_data:
+            SessionManager.set_session(s_data)
+            findings = s_data.get("originality_findings", []) or s_data.get("similarity_findings", [])
+            report = s_data.get("originality_report", {})
 
     st.markdown(
         """
@@ -40,7 +53,20 @@ def render_originality_analysis():
     )
 
     if not report and not findings:
-        st.info("Originality and AST fingerprint analysis has not been executed yet. Prepare or run a verification session to inspect code originality against standard patterns and repositories.")
+        st.info("Originality and AST fingerprint analysis has not been executed yet. Click below to inspect code originality against standard patterns and repositories.")
+        if repo_url and st.button("🚀 Run Originality & Pattern Audit", key="btn_run_orig_now"):
+            from services.api_client import APIClient
+            from config import DEFAULT_BACKEND_URL
+            api_client = APIClient(base_url=st.session_state.get("backend_url", DEFAULT_BACKEND_URL), timeout=5)
+            with st.spinner("Analyzing code originality & AST fingerprints..."):
+                ok, res, _ = api_client.start_analysis(
+                    candidate_id=cand_id or "CANDIDATE",
+                    repo_url=repo_url,
+                    claimed_skills=["Python"],
+                )
+                if ok and res.get("session_id"):
+                    st.session_state["active_session_id"] = res["session_id"]
+                    st.rerun()
         return
 
     # Overall Originality Metric Strip

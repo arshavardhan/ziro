@@ -5,30 +5,36 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from services.session_manager import (
-    get_default_aegis_session,
+    get_empty_session,
     compute_signature,
     verify_signature,
 )
+from services.validators import generate_candidate_id_from_repo
 
 
-def test_aegis_session_integrity():
-    """Verify primary candidate AegisAI session fixture data."""
-    session = get_default_aegis_session()
-    assert session["candidate_id"] == "CAND-001"
-    assert session["repo_url"] == "https://github.com/arshavardhan/AegisAi"
-    assert len(session["claimed_skills"]) == 7
-    assert "aegis/core/base.py" in session["code_files"]
-    assert "aegis/uncertainty/monte_carlo.py" in session["code_files"]
-    assert len(session["timeline"]) >= 7
-    assert len(session["git_commits"]) >= 5
-    assert len(session["viva_questions"]) == 3
+def test_empty_session_integrity():
+    """Verify clean initial empty session structure."""
+    session = get_empty_session()
+    assert session["candidate_id"] == ""
+    assert session["repo_url"] == ""
+    assert len(session["claimed_skills"]) == 0
+    assert session["status"] == "NOT_STARTED"
+    assert session["approval_status"] == "pending"
+
+
+def test_auto_generate_candidate_id():
+    """Verify Candidate ID auto-generation from repository URLs."""
+    assert generate_candidate_id_from_repo("https://github.com/octocat/Hello-World") == "CAND-OCTOCAT-HELLOWORLD"
+    assert generate_candidate_id_from_repo("https://github.com/torvalds/linux.git") == "CAND-TORVALDS-LINUX"
+    assert generate_candidate_id_from_repo("https://github.com/arshavardhan/ziro") == "CAND-ARSHAVARDHAN-ZIRO"
+    assert generate_candidate_id_from_repo("") == ""
 
 
 def test_cryptographic_signature_and_tamper_detection():
     """Verify HMAC signature validity and rejection of tampered payloads."""
     payload = {
-        "credential_id": "SP-CRED-2026-AEGIS-01",
-        "candidate_id": "CAND-001",
+        "credential_id": "SP-CRED-2026-LIVE-01",
+        "candidate_id": "CAND-DEV-01",
         "score": 94,
         "skills": ["Python", "OOP", "Machine Learning"]
     }

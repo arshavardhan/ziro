@@ -9,50 +9,39 @@ def render_skill_assessment_dashboard():
     cand_id = session.get("selected_candidate_id") or session.get("candidate_id", "")
     display_cand = cand_id if cand_id else "Unspecified Candidate"
     assessment = session.get("skill_assessment", {})
-    skills_data = assessment.get("skills", {})
+    skills_data = assessment.get("skills", {}) or session.get("skill_scores", {})
     overall_score = assessment.get("overall_score")
     overall_verdict = assessment.get("verdict", "PENDING_VERIFICATION")
-
-    st.markdown(
-        f"""
-        <div style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 2rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.5px;">
-                        Skill Assessment Matrix
-                    </h1>
-                    <p style="margin: 4px 0 0 0; color: #CBD5E1; font-size: 0.95rem;">
-                        Multi-dimensional assessment fusing Implementation, Testing, Git cadence, and Candidate Viva Comprehension for {display_cand}.
-                    </p>
-                </div>
-                <div>
-                    {'<span class="badge-verified">FINAL VERDICT: ' + str(overall_verdict) + (' (' + str(overall_score) + '/100)' if overall_score is not None else '') + '</span>' if overall_score is not None else '<span class="badge-pending">STATUS: ' + str(overall_verdict) + '</span>'}
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # Repository vs Understanding Distinction Notice
-    st.markdown(
-        """
-        <div style="background: rgba(37, 99, 235, 0.1); border-left: 4px solid #2563EB; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 20px;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #94A3B8; text-transform: uppercase;">
-                ⚖️ REPOSITORY QUALITY VS. CANDIDATE COMPREHENSION
-            </div>
-            <div style="font-size: 0.85rem; color: #F8FAFC; line-height: 1.4; margin-top: 2px;">
-                A strong repository does not automatically establish that the applicant understands it. 
-                Final verdicts evaluate both <strong>static repository quality</strong> (AST + tests) and <strong>candidate conceptual viva ownership</strong>.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    repo_url = session.get("selected_repository_url") or session.get("repo_url", "")
 
     if not skills_data:
-        st.info("No skill assessment results available. Enter candidate information and run repository verification to generate multi-dimensional skill ratings.")
-        return
+        active_sid = st.session_state.get("active_session_id")
+        from services.api_client import APIClient
+        from config import DEFAULT_BACKEND_URL
+        api_client = APIClient(base_url=st.session_state.get("backend_url", DEFAULT_BACKEND_URL), timeout=5)
+
+        if active_sid:
+            ok, s_data, _ = api_client.get_session(active_sid)
+            if ok and s_data:
+                SessionManager.set_session(s_data)
+                assessment = s_data.get("skill_assessment", {})
+                skills_data = assessment.get("skills", {}) or s_data.get("skill_scores", {})
+                overall_score = assessment.get("overall_score")
+                overall_verdict = assessment.get("verdict", "VERIFIED")
+
+        if not skills_data:
+            st.info("No skill assessment results available yet for this candidate.")
+            if repo_url and st.button("🚀 Evaluate Candidate Skills Now", key="btn_eval_skills_now"):
+                with st.spinner("Analyzing code evidence & scoring skills..."):
+                    ok, res, _ = api_client.start_analysis(
+                        candidate_id=cand_id or "CANDIDATE",
+                        repo_url=repo_url,
+                        claimed_skills=["Python", "Software Architecture", "Git/GitHub"],
+                    )
+                    if ok and res.get("session_id"):
+                        st.session_state["active_session_id"] = res["session_id"]
+                        st.rerun()
+            return
 
     # Plotly Charts: Radar + Breakdown
     c_radar, c_bars = st.columns([1, 1.2])

@@ -195,7 +195,7 @@ def render_credential_viewer():
 
         col_orig, col_tamp = st.columns([1, 1])
 
-        active_cand = cand_id if cand_id else "CAND-AUDIT-SAMPLE"
+        active_cand = cand_id or st.session_state.get("selected_candidate_id") or "CAND-VERIFIED-01"
         genuine = {
             "credential_id": "SP-CRED-TEST-VERIFY",
             "candidate_id": active_cand,

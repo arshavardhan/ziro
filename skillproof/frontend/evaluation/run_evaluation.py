@@ -25,8 +25,8 @@ def evaluate_case(test_case: Dict[str, Any]) -> Dict[str, Any]:
 
     # TC-16: Tamper check test
     if tc_id == "TC-16":
-        original = {"id": "SP-CRED-2026-AEGIS-01", "score": 75}
-        tampered = {"id": "SP-CRED-2026-AEGIS-01", "score": 99}
+        original = {"id": "SP-CRED-2026-VERIFY-01", "score": 75}
+        tampered = {"id": "SP-CRED-2026-VERIFY-01", "score": 99}
         sig = compute_signature(original)
         is_valid = verify_signature(tampered, sig)
         status = "INVALID_SIGNATURE" if not is_valid else "VERIFIED"

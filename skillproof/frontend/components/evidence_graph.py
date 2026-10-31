@@ -16,43 +16,45 @@ def render_evidence_explorer():
     """Render the Evidence Explorer with filtering by skill and classification."""
     session = SessionManager.get_session()
     cand_id = session.get("candidate_id") or st.session_state.get("selected_candidate_id", "")
-    evidence_list = session.get("evidence", []) or session.get("evidence_cards", [])
-
-    st.markdown(
-        f"""
-        <div style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 2rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.5px;">
-                        Skill Evidence Explorer
-                    </h1>
-                    <p style="margin: 4px 0 0 0; color: #CBD5E1; font-size: 0.95rem;">
-                        Granular evidence cards mapping claimed skills to AST line ranges, passing unit tests, and structural findings.
-                    </p>
-                </div>
-                <div>
-                    {f'<span class="badge-verified">CANDIDATE: {cand_id}</span>' if cand_id else '<span class="badge-pending">NO CANDIDATE SELECTED</span>'}
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    evidence_list = session.get("code_evidence", []) or session.get("evidence", []) or session.get("evidence_cards", [])
+    repo_url = session.get("selected_repository_url") or session.get("repo_url", "")
 
     if not evidence_list:
-        st.markdown(
-            """
-            <div style="background: #1B2638; border: 1px solid #334155; border-radius: 12px; padding: 40px 20px; text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 10px;">📋</div>
-                <h3 style="color: #F8FAFC; margin-bottom: 6px;">No Skill Evidence Available</h3>
-                <p style="color: #94A3B8; font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
-                    Skill evidence cards mapping source code implementations to test cases will appear once candidate verification is executed.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        return
+        active_sid = st.session_state.get("active_session_id")
+        from services.api_client import APIClient
+        from config import DEFAULT_BACKEND_URL
+        api_client = APIClient(base_url=st.session_state.get("backend_url", DEFAULT_BACKEND_URL), timeout=5)
+
+        if active_sid:
+            ok, s_data, _ = api_client.get_session(active_sid)
+            if ok and s_data:
+                SessionManager.set_session(s_data)
+                evidence_list = s_data.get("code_evidence", []) or s_data.get("evidence", [])
+
+        if not evidence_list:
+            st.markdown(
+                """
+                <div style="background: #1B2638; border: 1px solid #334155; border-radius: 12px; padding: 40px 20px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📋</div>
+                    <h3 style="color: #F8FAFC; margin-bottom: 6px;">No Skill Evidence Available Yet</h3>
+                    <p style="color: #94A3B8; font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+                        Skill evidence cards mapping source code implementations to AST line ranges and tests appear when analysis executes.
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if repo_url and st.button("🚀 Extract AST Code Evidence Now", key="btn_extract_evidence_now"):
+                with st.spinner("Extracting AST findings & syntax evidence..."):
+                    ok, res, _ = api_client.start_analysis(
+                        candidate_id=cand_id or "CANDIDATE",
+                        repo_url=repo_url,
+                        claimed_skills=["Python", "Software Architecture"],
+                    )
+                    if ok and res.get("session_id"):
+                        st.session_state["active_session_id"] = res["session_id"]
+                        st.rerun()
+            return
 
     # Filters Row
     f_col1, f_col2 = st.columns([1, 1])

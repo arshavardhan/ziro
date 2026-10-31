@@ -4,7 +4,12 @@ import streamlit as st
 from config import DEFAULT_BACKEND_URL, SUPPORTED_SKILLS
 from services.api_client import APIClient
 from services.session_manager import SessionManager
-from services.validators import validate_candidate_id, validate_github_url, extract_github_repo_info
+from services.validators import (
+    validate_candidate_id,
+    validate_github_url,
+    extract_github_repo_info,
+    generate_candidate_id_from_repo,
+)
 
 # Local fallback parser for zero-latency client-side resume extraction
 try:
@@ -67,19 +72,16 @@ def render_candidate_submission_form():
         unsafe_allow_html=True,
     )
 
-    col_cid, col_url = st.columns([1, 2])
-    with col_cid:
-        default_cid = st.session_state.get(
-            "selected_candidate_id",
-            st.session_state.get("input_candidate_id", f"CAND-{uuid.uuid4().hex[:6].upper()}"),
-        )
-        cand_id = st.text_input(
-            "Candidate ID *",
-            value=default_cid,
-            placeholder="e.g. CAND-1024",
-            help="Unique identifier for the applicant being verified",
-            key="cf_candidate_id",
-        )
+    def on_cf_repo_url_change():
+        url = st.session_state.get("cf_repo_url", "").strip()
+        if url:
+            auto_id = generate_candidate_id_from_repo(url)
+            if auto_id:
+                st.session_state["cf_candidate_id"] = auto_id
+                st.session_state["input_candidate_id"] = auto_id
+                st.session_state["selected_candidate_id"] = auto_id
+
+    col_url, col_cid = st.columns([2, 1.3])
     with col_url:
         repo_url = st.text_input(
             "GitHub Repository URL *",
@@ -87,8 +89,33 @@ def render_candidate_submission_form():
                 "selected_repository_url", st.session_state.get("input_repo_url", "")
             ),
             placeholder="https://github.com/username/repository",
-            help="Public HTTPS GitHub repository URL (e.g. https://github.com/owner/repo)",
+            help="Public HTTPS GitHub repository URL (Candidate Profile ID auto-generates from this link)",
             key="cf_repo_url",
+            on_change=on_cf_repo_url_change,
+        )
+    with col_cid:
+        current_cid = st.session_state.get("cf_candidate_id") or st.session_state.get("selected_candidate_id") or st.session_state.get("input_candidate_id", "")
+        if not current_cid and repo_url:
+            current_cid = generate_candidate_id_from_repo(repo_url)
+            st.session_state["cf_candidate_id"] = current_cid
+            st.session_state["input_candidate_id"] = current_cid
+
+        cand_id = st.text_input(
+            "Candidate Profile ID * (Auto-Generated)",
+            value=current_cid,
+            placeholder="Auto-derived from repository URL",
+            help="Unique identifier auto-derived from your repository link (editable)",
+            key="cf_candidate_id",
+        )
+
+    if repo_url and cand_id:
+        st.markdown(
+            f"""
+            <div style="font-size: 0.78rem; color: #60A5FA; margin-top: -6px; margin-bottom: 8px;">
+                ⚡ <b>Profile Linked:</b> Candidate ID <code>{cand_id}</code> auto-derived from repository URL.
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     col_sha, col_preview = st.columns([1.5, 1.5])
@@ -295,12 +322,19 @@ def render_candidate_submission_form():
     )
 
     if launch_clicked:
-        is_valid_cid, cid_err = validate_candidate_id(cand_id)
+        clean_url = repo_url.strip() if repo_url else ""
+        clean_cid = cand_id.strip() if cand_id else ""
+        if not clean_cid and clean_url:
+            clean_cid = generate_candidate_id_from_repo(clean_url)
+            st.session_state["cf_candidate_id"] = clean_cid
+            st.session_state["input_candidate_id"] = clean_cid
+
+        is_valid_cid, cid_err = validate_candidate_id(clean_cid)
         if not is_valid_cid:
             st.error(f"Candidate ID Validation Error: {cid_err}")
             return
 
-        is_valid_url, url_err = validate_github_url(repo_url)
+        is_valid_url, url_err = validate_github_url(clean_url)
         if not is_valid_url:
             st.error(f"Repository URL Validation Error: {url_err}")
             return

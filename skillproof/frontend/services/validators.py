@@ -118,6 +118,46 @@ def extract_github_repo_info(url: str) -> Tuple[str, str]:
     return "", ""
 
 
+def generate_candidate_id_from_repo(url: str) -> str:
+    """Auto-generate a deterministic and clean Candidate Profile ID from a GitHub repo URL.
+
+    Examples:
+        https://github.com/octocat/Hello-World -> CAND-OCTOCAT-HELLO-WORLD
+        https://github.com/torvalds/linux -> CAND-TORVALDS-LINUX
+        https://github.com/arshavardhan/ziro -> CAND-ARSHAVARDHAN-ZIRO
+
+    Args:
+        url: Candidate GitHub repository URL.
+
+    Returns:
+        str: Candidate Profile ID or empty string if input is blank.
+    """
+    if not url or not isinstance(url, str) or not url.strip():
+        return ""
+    try:
+        cleaned = url.strip().rstrip("/")
+        if cleaned.endswith(".git"):
+            cleaned = cleaned[:-4]
+        parsed = urlparse(cleaned)
+        path_parts = [p for p in parsed.path.strip("/").split("/") if p]
+        if len(path_parts) >= 2:
+            owner = path_parts[0]
+            repo = path_parts[1]
+            clean_owner = re.sub(r"[^A-Za-z0-9]", "", owner).upper()
+            clean_repo = re.sub(r"[^A-Za-z0-9]", "", repo).upper()
+            if clean_owner and clean_repo:
+                return f"CAND-{clean_owner}-{clean_repo[:12]}"
+            elif clean_owner:
+                return f"CAND-{clean_owner}"
+        elif len(path_parts) == 1:
+            clean_owner = re.sub(r"[^A-Za-z0-9]", "", path_parts[0]).upper()
+            if clean_owner:
+                return f"CAND-{clean_owner}"
+    except Exception:
+        pass
+    return ""
+
+
 def validate_candidate_id(cand_id: str) -> Tuple[bool, str]:
     """Validate that Candidate ID is present, non-empty, and conforms to basic ID format.
 
