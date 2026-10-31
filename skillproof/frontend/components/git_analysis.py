@@ -54,16 +54,18 @@ def render_git_forensics():
 
         if not commits:
             st.info("No git commit forensics available yet for this repository.")
-            if repo_url and st.button("🚀 Analyze Git History & Forensics Now", key="btn_analyze_git_now"):
+            if repo_url and st.button("🚀 Analyze Git History & Forensics Now", key="btn_analyze_git_now", type="primary"):
                 with st.spinner("Extracting git history & commit cadence..."):
-                    ok, res, _ = api_client.start_analysis(
+                    from services.autonomous_agent import execute_autonomous_verification
+                    verified = execute_autonomous_verification(
                         candidate_id=cand_id or "CANDIDATE",
                         repo_url=repo_url,
-                        claimed_skills=["Git/GitHub", "Python"],
+                        claimed_skills=session.get("claimed_skills") or ["Python", "Machine Learning", "Software Architecture", "Testing", "Git/GitHub"],
+                        description=session.get("description") or "",
+                        resume_profile=st.session_state.get("parsed_resume_profile"),
                     )
-                    if ok and res.get("session_id"):
-                        st.session_state["active_session_id"] = res["session_id"]
-                        st.rerun()
+                    SessionManager.set_session(verified)
+                    st.rerun()
             return
 
     # Plotly Charts: Commit Size & Diff Distribution

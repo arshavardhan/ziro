@@ -81,6 +81,9 @@ def render_candidate_submission_form():
                 st.session_state["cf_candidate_id"] = auto_id
                 st.session_state["input_candidate_id"] = auto_id
                 st.session_state["selected_candidate_id"] = auto_id
+            st.session_state["selected_repository_url"] = url
+            st.session_state["selected_repo_url"] = url
+            st.session_state["input_repo_url"] = url
 
     col_url, col_cid = st.columns([2, 1.3])
     with col_url:

@@ -37,8 +37,22 @@ def render_technical_viva():
         unsafe_allow_html=True,
     )
 
+    repo_url = session.get("repo_url") or st.session_state.get("selected_repository_url", "")
+
     if not viva_questions:
         st.info("No technical viva inquiries currently available. Once repository analysis is conducted, the verification engine synthesizes targeted conceptual inquiries for candidate evaluation.")
+        if repo_url and st.button("🚀 Synthesize Viva Questions Grounded in Code Now", key="btn_synth_viva_now", type="primary"):
+            with st.spinner("Analyzing repository AST symbols and generating viva inquiries..."):
+                from services.autonomous_agent import execute_autonomous_verification
+                verified = execute_autonomous_verification(
+                    candidate_id=cand_id or "CANDIDATE",
+                    repo_url=repo_url,
+                    claimed_skills=session.get("claimed_skills") or ["Python", "Machine Learning", "Software Architecture", "Testing", "Git/GitHub"],
+                    description=session.get("description") or "",
+                    resume_profile=st.session_state.get("parsed_resume_profile"),
+                )
+                SessionManager.set_session(verified)
+                st.rerun()
         return
 
     # Questions Loop
@@ -97,14 +111,21 @@ def render_technical_viva():
 
         eval_key = f"eval_res_{qid}"
         if sub_ans and user_answer.strip():
+            evaluated = False
             if is_live:
-                ok, live_eval, err = api_client.submit_viva_answer(session_id, qid, user_answer)
-                if ok:
-                    st.session_state[eval_key] = live_eval
-                else:
-                    st.error(f"Viva submission error: {err}")
-            else:
-                st.warning("Backend service is offline. Live FastAPI backend connection is required to evaluate technical viva responses.")
+                try:
+                    ok, live_eval, err = api_client.submit_viva_answer(session_id, qid, user_answer)
+                    if ok and live_eval:
+                        st.session_state[eval_key] = live_eval
+                        evaluated = True
+                except Exception:
+                    pass
+
+            if not evaluated:
+                from services.autonomous_agent import evaluate_viva_answer
+                local_eval = evaluate_viva_answer(q_data, user_answer)
+                st.session_state[eval_key] = local_eval
+                st.success(f"✓ Candidate response evaluated against `{src}` code groundings!")
 
         active_eval = st.session_state.get(eval_key)
 

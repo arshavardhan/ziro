@@ -54,19 +54,18 @@ def render_originality_analysis():
 
     if not report and not findings:
         st.info("Originality and AST fingerprint analysis has not been executed yet. Click below to inspect code originality against standard patterns and repositories.")
-        if repo_url and st.button("🚀 Run Originality & Pattern Audit", key="btn_run_orig_now"):
-            from services.api_client import APIClient
-            from config import DEFAULT_BACKEND_URL
-            api_client = APIClient(base_url=st.session_state.get("backend_url", DEFAULT_BACKEND_URL), timeout=5)
+        if repo_url and st.button("🚀 Run Originality & Pattern Audit", key="btn_run_orig_now", type="primary"):
             with st.spinner("Analyzing code originality & AST fingerprints..."):
-                ok, res, _ = api_client.start_analysis(
+                from services.autonomous_agent import execute_autonomous_verification
+                verified = execute_autonomous_verification(
                     candidate_id=cand_id or "CANDIDATE",
                     repo_url=repo_url,
-                    claimed_skills=["Python"],
+                    claimed_skills=session.get("claimed_skills") or ["Python", "Machine Learning", "Software Architecture", "Testing", "Git/GitHub"],
+                    description=session.get("description") or "",
+                    resume_profile=st.session_state.get("parsed_resume_profile"),
                 )
-                if ok and res.get("session_id"):
-                    st.session_state["active_session_id"] = res["session_id"]
-                    st.rerun()
+                SessionManager.set_session(verified)
+                st.rerun()
         return
 
     # Overall Originality Metric Strip
